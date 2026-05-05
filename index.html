@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <title>Gift Battle</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #090b18;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .app {
+      padding: 18px;
+      text-align: center;
+    }
+
+    .profile {
+      background: #15182d;
+      border-radius: 20px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .case-card {
+      background: linear-gradient(180deg, #1e2240, #121426);
+      border-radius: 25px;
+      padding: 22px;
+      margin-bottom: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .gift {
+      font-size: 80px;
+      margin: 20px 0;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 16px;
+      margin-top: 10px;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .open {
+      background: linear-gradient(135deg, #ffd000, #ff8a00);
+      color: #111;
+    }
+
+    .battle {
+      background: linear-gradient(135deg, #ff006e, #7b2cff);
+      color: white;
+    }
+
+    .top {
+      background: #15182d;
+      border-radius: 20px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .small {
+      color: #aaa;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>🎁 Gift Battle</h1>
+
+    <div class="profile">
+      <div id="user">Загрузка...</div>
+      <div class="small">Mini App connected</div>
+    </div>
+
+    <div class="case-card">
+      <div class="gift">🎁</div>
+      <h2>Basic Case</h2>
+      <p>Цена: 10⭐</p>
+
+      <button class="open" onclick="openCase(1)">
+        🎁 Открыть кейс
+      </button>
+
+      <button class="battle" onclick="battleCase(1)">
+        ⚔️ Battle
+      </button>
+    </div>
+
+    <div class="top">
+      <h3>🏆 TOP</h3>
+      <p class="small">Рейтинг смотри в боте</p>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const user = tg.initDataUnsafe.user;
+
+    if (user) {
+      document.getElementById("user").innerText =
+        "Игрок: @" + (user.username || user.first_name);
+    }
+
+    function openCase(caseId) {
+      tg.sendData(JSON.stringify({
+        action: "open_case",
+        case_id: caseId
+      }));
+    }
+
+    function battleCase(caseId) {
+      tg.sendData(JSON.stringify({
+        action: "battle_case",
+        case_id: caseId
+      }));
+    }
+  </script>
+</body>
+</html>
