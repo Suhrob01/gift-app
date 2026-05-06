@@ -4,77 +4,78 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <title>Gift Battle</title>
+  <title>Gift Battle Roulette</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Arial, sans-serif;
       background:
-        radial-gradient(circle at top, #39236d, transparent 35%),
-        linear-gradient(180deg, #090b18, #111429);
-      color: white;
+        radial-gradient(circle at top, #3d2173, transparent 32%),
+        linear-gradient(180deg, #080a17, #111429);
+      color: #fff;
       overflow-x: hidden;
     }
 
     .app {
       padding: 18px;
-      padding-bottom: 90px;
+      padding-bottom: 95px;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .title {
-      font-size: 26px;
-      font-weight: 800;
+      font-size: 25px;
+      font-weight: 900;
     }
 
     .balance {
       background: #1b1f3a;
-      padding: 9px 13px;
+      padding: 9px 14px;
       border-radius: 999px;
-      font-weight: bold;
+      font-weight: 900;
+      box-shadow: 0 8px 25px rgba(0,0,0,.35);
     }
 
     .profile {
       background: linear-gradient(135deg, #24294b, #171a31);
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: 24px;
       padding: 15px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .username {
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 800;
     }
 
     .small {
-      color: #a9adc8;
+      color: #aeb3d4;
       font-size: 13px;
-      margin-top: 4px;
+      margin-top: 5px;
     }
 
-    .roulette-card {
-      background: linear-gradient(180deg, #202547, #111429);
-      border-radius: 28px;
+    .case-card {
+      background: linear-gradient(180deg, #22274a, #111429);
+      border-radius: 30px;
       padding: 18px;
-      margin-bottom: 18px;
       text-align: center;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
     }
 
     .case-img {
-      font-size: 86px;
-      margin: 15px 0;
+      font-size: 82px;
+      margin: 12px 0;
       animation: float 2s ease-in-out infinite;
     }
 
@@ -84,102 +85,173 @@
       100% { transform: translateY(0) rotate(-2deg); }
     }
 
-    .roulette {
-      height: 90px;
-      background: #0c0f22;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 18px 0;
+    .roulette-wrap {
       position: relative;
+      height: 118px;
+      margin: 20px 0;
+      background: #090c1d;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 0 25px rgba(0,0,0,.55);
+    }
+
+    .roulette-shadow-left,
+    .roulette-shadow-right {
+      position: absolute;
+      top: 0;
+      width: 55px;
+      height: 100%;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .roulette-shadow-left {
+      left: 0;
+      background: linear-gradient(90deg, #090c1d, transparent);
+    }
+
+    .roulette-shadow-right {
+      right: 0;
+      background: linear-gradient(270deg, #090c1d, transparent);
     }
 
     .pointer {
       position: absolute;
       top: 0;
       left: 50%;
-      width: 3px;
+      width: 4px;
       height: 100%;
-      background: #ffd000;
-      z-index: 5;
-      box-shadow: 0 0 14px #ffd000;
+      transform: translateX(-50%);
+      background: #ffd400;
+      box-shadow: 0 0 18px #ffd400;
+      z-index: 10;
+    }
+
+    .pointer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-top: 15px solid #ffd400;
     }
 
     .items {
       display: flex;
       gap: 10px;
-      padding: 12px;
+      padding: 13px;
       transform: translateX(0);
-      transition: transform 2.5s cubic-bezier(.15,.85,.25,1);
+      transition: transform 4s cubic-bezier(.12,.85,.16,1);
+      will-change: transform;
     }
 
     .item {
-      min-width: 74px;
-      height: 66px;
-      background: linear-gradient(135deg, #2f3565, #1a1f3d);
-      border-radius: 17px;
+      min-width: 88px;
+      height: 92px;
+      border-radius: 20px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      border: 2px solid rgba(255,255,255,.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,.35);
+      position: relative;
+      overflow: hidden;
     }
+
+    .item::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.18), transparent 45%);
+      pointer-events: none;
+    }
+
+    .emoji {
+      font-size: 34px;
+      z-index: 2;
+    }
+
+    .item-name {
+      font-size: 11px;
+      margin-top: 6px;
+      font-weight: 800;
+      z-index: 2;
+    }
+
+    .common { background: linear-gradient(135deg, #2e365f, #1b203d); }
+    .rare { background: linear-gradient(135deg, #154a7a, #172f63); border-color: #40b6ff; }
+    .epic { background: linear-gradient(135deg, #5622a8, #2a1859); border-color: #a75cff; }
+    .legendary { background: linear-gradient(135deg, #b06b00, #6b2900); border-color: #ffd000; }
+    .mythic { background: linear-gradient(135deg, #bd0b56, #4d1039); border-color: #ff4fa3; }
+
+    .rarity {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      margin-top: 5px;
+    }
+
+    .r-common { background: #313959; color: #d7dcff; }
+    .r-rare { background: #063c63; color: #66c8ff; }
+    .r-epic { background: #3f177a; color: #c996ff; }
+    .r-legendary { background: #664000; color: #ffd45c; }
+    .r-mythic { background: #65062c; color: #ff77b6; }
 
     button {
       width: 100%;
       border: none;
-      border-radius: 18px;
+      border-radius: 19px;
       padding: 15px;
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 900;
       margin-top: 10px;
+    }
+
+    button:disabled {
+      opacity: .55;
     }
 
     .open {
       background: linear-gradient(135deg, #ffd000, #ff8a00);
-      color: #151515;
+      color: #141414;
+      box-shadow: 0 10px 30px rgba(255,160,0,.32);
     }
 
     .battle {
       background: linear-gradient(135deg, #ff006e, #7b2cff);
       color: white;
+      box-shadow: 0 10px 30px rgba(255,0,110,.25);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .mini-card {
-      background: #171b34;
+    .result {
+      margin-top: 15px;
+      background: #141832;
       border-radius: 22px;
       padding: 15px;
-      min-height: 96px;
+      display: none;
+      border: 1px solid rgba(255,255,255,.08);
+      animation: pop .35s ease;
     }
 
-    .bottom-nav {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      background: rgba(18, 21, 42, 0.95);
-      border-radius: 24px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      padding: 8px;
+    @keyframes pop {
+      0% { transform: scale(.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
-    .nav-btn {
-      background: transparent;
-      color: #b9bdd6;
-      font-size: 13px;
-      padding: 9px 4px;
-      border-radius: 16px;
-      margin-top: 0;
+    .result-emoji {
+      font-size: 58px;
+      margin-bottom: 5px;
     }
 
-    .nav-btn.active {
-      background: #24294b;
-      color: white;
+    .result-name {
+      font-size: 22px;
+      font-weight: 900;
     }
 
     .toast {
@@ -193,12 +265,42 @@
       padding: 14px;
       text-align: center;
       transform: translateY(-120px);
-      transition: 0.3s;
+      transition: .3s;
       z-index: 50;
+      border: 1px solid rgba(255,255,255,.1);
     }
 
     .toast.show {
       transform: translateY(0);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      background: rgba(18, 21, 42, .96);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: #b9bdd6;
+      font-size: 13px;
+      padding: 9px 4px;
+      border-radius: 16px;
+      margin: 0;
+      box-shadow: none;
+    }
+
+    .nav-btn.active {
+      background: #24294b;
+      color: white;
     }
   </style>
 </head>
@@ -214,43 +316,28 @@
 
     <div class="profile">
       <div class="username" id="user">Игрок</div>
-      <div class="small">Открывай кейсы и участвуй в battle</div>
+      <div class="small">Открывай кейсы, лови редкие подарки и участвуй в battle</div>
     </div>
 
-    <div class="roulette-card">
+    <div class="case-card">
       <div class="case-img">🎁</div>
-      <h2>Basic Case</h2>
+      <h2>Premium Case</h2>
       <p class="small">Цена открытия: 10⭐</p>
 
-      <div class="roulette">
+      <div class="roulette-wrap">
+        <div class="roulette-shadow-left"></div>
+        <div class="roulette-shadow-right"></div>
         <div class="pointer"></div>
-        <div class="items" id="items">
-          <div class="item">💎</div>
-          <div class="item">🎖️</div>
-          <div class="item">🔥</div>
-          <div class="item">🎁</div>
-          <div class="item">⭐</div>
-          <div class="item">💰</div>
-          <div class="item">🏆</div>
-          <div class="item">🎉</div>
-          <div class="item">💎</div>
-          <div class="item">🔥</div>
-        </div>
+        <div class="items" id="items"></div>
       </div>
 
-      <button class="open" onclick="openCase(1)">🎁 Открыть кейс</button>
-      <button class="battle" onclick="battleCase(1)">⚔️ Battle 1x1</button>
-    </div>
+      <button class="open" id="openBtn" onclick="openCase(1)">🎰 Открыть кейс</button>
+      <button class="battle" id="battleBtn" onclick="battleCase(1)">⚔️ Battle 1x1</button>
 
-    <div class="grid">
-      <div class="mini-card">
-        <h3>🏆 TOP</h3>
-        <div class="small">Рейтинг игроков смотри в боте</div>
-      </div>
-
-      <div class="mini-card">
-        <h3>👥 Рефералы</h3>
-        <div class="small">Приглашай друзей и получай бонус</div>
+      <div class="result" id="result">
+        <div class="result-emoji" id="resultEmoji">🎁</div>
+        <div class="result-name" id="resultName">Prize</div>
+        <div class="rarity" id="resultRarity">COMMON</div>
       </div>
     </div>
   </div>
@@ -266,10 +353,55 @@
     tg.expand();
 
     const user = tg.initDataUnsafe.user;
-
     if (user) {
       document.getElementById("user").innerText =
         "@" + (user.username || user.first_name);
+    }
+
+    const prizes = [
+      { emoji: "🪙", name: "Coins", rarity: "common", chance: 45 },
+      { emoji: "💎", name: "Diamond", rarity: "rare", chance: 25 },
+      { emoji: "🎖️", name: "Medal", rarity: "rare", chance: 15 },
+      { emoji: "🔥", name: "Fire Gift", rarity: "epic", chance: 8 },
+      { emoji: "👑", name: "Crown", rarity: "legendary", chance: 5 },
+      { emoji: "💝", name: "Super Gift", rarity: "mythic", chance: 2 }
+    ];
+
+    function weightedRandom() {
+      const total = prizes.reduce((sum, p) => sum + p.chance, 0);
+      let rand = Math.random() * total;
+
+      for (const prize of prizes) {
+        rand -= prize.chance;
+        if (rand <= 0) return prize;
+      }
+
+      return prizes[0];
+    }
+
+    function createItem(prize) {
+      const div = document.createElement("div");
+      div.className = "item " + prize.rarity;
+      div.innerHTML = `
+        <div class="emoji">${prize.emoji}</div>
+        <div class="item-name">${prize.name}</div>
+      `;
+      return div;
+    }
+
+    function fillRoulette(winner) {
+      const items = document.getElementById("items");
+      items.innerHTML = "";
+
+      const list = [];
+
+      for (let i = 0; i < 42; i++) {
+        list.push(prizes[Math.floor(Math.random() * prizes.length)]);
+      }
+
+      list[36] = winner;
+
+      list.forEach(prize => items.appendChild(createItem(prize)));
     }
 
     function toast(text) {
@@ -279,39 +411,69 @@
       setTimeout(() => el.classList.remove("show"), 1800);
     }
 
-    function spinRoulette() {
+    function showResult(prize) {
+      const result = document.getElementById("result");
+      const rarity = document.getElementById("resultRarity");
+
+      document.getElementById("resultEmoji").innerText = prize.emoji;
+      document.getElementById("resultName").innerText = prize.name;
+
+      rarity.className = "rarity r-" + prize.rarity;
+      rarity.innerText = prize.rarity.toUpperCase();
+
+      result.style.display = "block";
+    }
+
+    function spin(callbackAction, caseId) {
+      const winner = weightedRandom();
       const items = document.getElementById("items");
+      const openBtn = document.getElementById("openBtn");
+      const battleBtn = document.getElementById("battleBtn");
+
+      document.getElementById("result").style.display = "none";
+
+      openBtn.disabled = true;
+      battleBtn.disabled = true;
+
+      fillRoulette(winner);
+
       items.style.transition = "none";
       items.style.transform = "translateX(0px)";
 
       setTimeout(() => {
-        items.style.transition = "transform 2.5s cubic-bezier(.15,.85,.25,1)";
-        items.style.transform = "translateX(-520px)";
-      }, 50);
+        const itemWidth = 98;
+        const winnerIndex = 36;
+        const screenCenter = window.innerWidth / 2;
+        const offset = winnerIndex * itemWidth - screenCenter + 62;
+
+        items.style.transition = "transform 4s cubic-bezier(.12,.85,.16,1)";
+        items.style.transform = `translateX(-${offset}px)`;
+      }, 80);
+
+      setTimeout(() => {
+        showResult(winner);
+        toast("🎉 Выпало: " + winner.name);
+
+        tg.sendData(JSON.stringify({
+          action: callbackAction,
+          case_id: caseId,
+          visual_prize: winner.name,
+          visual_rarity: winner.rarity
+        }));
+
+        openBtn.disabled = false;
+        battleBtn.disabled = false;
+      }, 4300);
     }
 
     function openCase(caseId) {
-      spinRoulette();
-      toast("🎁 Открываем кейс...");
-
-      setTimeout(() => {
-        tg.sendData(JSON.stringify({
-          action: "open_case",
-          case_id: caseId
-        }));
-      }, 2500);
+      toast("🎰 Крутим рулетку...");
+      spin("open_case", caseId);
     }
 
     function battleCase(caseId) {
-      spinRoulette();
       toast("⚔️ Запускаем battle...");
-
-      setTimeout(() => {
-        tg.sendData(JSON.stringify({
-          action: "battle_case",
-          case_id: caseId
-        }));
-      }, 2500);
+      spin("battle_case", caseId);
     }
 
     function sendBot(action) {
@@ -320,6 +482,8 @@
         case_id: 1
       }));
     }
+
+    fillRoulette(prizes[0]);
   </script>
 </body>
 </html>
