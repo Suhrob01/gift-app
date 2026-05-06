@@ -2,488 +2,355 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <title>Gift Battle Roulette</title>
+  <title>Gift Battle</title>
 
   <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:#f4f5f8;
+      color:#111;
+      overflow-x:hidden;
+    }
+    .app{padding:18px 16px 95px}
+    .hero{
+      background:linear-gradient(180deg,#fff,#f4f5f8);
+      border-radius:0 0 34px 34px;
+      text-align:center;
+      padding:20px 12px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .stars{
+      position:absolute;inset:0;
       background:
-        radial-gradient(circle at top, #3d2173, transparent 32%),
-        linear-gradient(180deg, #080a17, #111429);
-      color: #fff;
-      overflow-x: hidden;
+        radial-gradient(circle at 15% 25%,#ffb13b 0 3px,transparent 4px),
+        radial-gradient(circle at 70% 18%,#ff7d4d 0 4px,transparent 5px),
+        radial-gradient(circle at 82% 45%,#ffd25d 0 3px,transparent 4px),
+        radial-gradient(circle at 30% 60%,#ff9f3d 0 4px,transparent 5px);
+      opacity:.8;
+      animation:spark 2.8s infinite alternate;
     }
-
-    .app {
-      padding: 18px;
-      padding-bottom: 95px;
+    @keyframes spark{from{transform:scale(1)}to{transform:scale(1.08)}}
+    .avatar{
+      width:92px;height:92px;border-radius:50%;
+      margin:10px auto 12px;
+      background:linear-gradient(135deg,#252b4a,#6b8cff);
+      border:4px solid #fff;
+      box-shadow:0 10px 25px rgba(0,0,0,.15);
+      position:relative;z-index:2;
+      display:flex;align-items:center;justify-content:center;
+      font-size:42px;
     }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+    h1{margin:0;font-size:32px;position:relative;z-index:2}
+    .sub{font-size:16px;line-height:1.35;color:#333;position:relative;z-index:2;margin:10px 0}
+    .balance{
+      position:absolute;top:16px;right:18px;z-index:3;
+      font-weight:900;font-size:18px;
     }
-
-    .title {
-      font-size: 25px;
-      font-weight: 900;
+    .tabs{
+      display:flex;gap:8px;justify-content:center;margin-top:15px;position:relative;z-index:2
     }
-
-    .balance {
-      background: #1b1f3a;
-      padding: 9px 14px;
-      border-radius: 999px;
-      font-weight: 900;
-      box-shadow: 0 8px 25px rgba(0,0,0,.35);
+    .tab{
+      border:0;border-radius:999px;padding:10px 18px;
+      font-size:16px;font-weight:800;background:#e9eaee;color:#666
     }
+    .tab.active{background:#fff;color:#111;box-shadow:0 4px 16px rgba(0,0,0,.08)}
 
-    .profile {
-      background: linear-gradient(135deg, #24294b, #171a31);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px;
-      padding: 15px;
-      margin-bottom: 16px;
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:18px;
     }
-
-    .username {
-      font-size: 18px;
-      font-weight: 800;
+    .gift{
+      background:#fff;border-radius:18px;
+      min-height:150px;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      box-shadow:0 3px 12px rgba(0,0,0,.08);
+      position:relative;
+      overflow:hidden;
+      animation:fade .35s ease;
     }
-
-    .small {
-      color: #aeb3d4;
-      font-size: 13px;
-      margin-top: 5px;
+    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .gift .img{
+      font-size:62px;
+      filter:drop-shadow(0 8px 8px rgba(0,0,0,.18));
+      animation:float 2.2s infinite ease-in-out;
     }
-
-    .case-card {
-      background: linear-gradient(180deg, #22274a, #111429);
-      border-radius: 30px;
-      padding: 18px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    .price{
+      margin-top:14px;
+      background:#fff1c9;color:#bf7b00;
+      padding:7px 16px;border-radius:999px;
+      font-weight:900;font-size:16px;
     }
-
-    .case-img {
-      font-size: 82px;
-      margin: 12px 0;
-      animation: float 2s ease-in-out infinite;
+    .badge{
+      position:absolute;top:8px;left:8px;
+      font-size:10px;font-weight:900;
+      padding:5px 7px;border-radius:999px;
+      color:white;
     }
+    .common{background:#8892a8}
+    .rare{background:#2b9cff}
+    .epic{background:#9b4dff}
+    .legend{background:#ff9d00}
+    .mythic{background:#ff2d82}
 
-    @keyframes float {
-      0% { transform: translateY(0) rotate(-2deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
-      100% { transform: translateY(0) rotate(-2deg); }
+    .rouletteBox{
+      display:none;
+      position:fixed;left:0;right:0;bottom:0;top:0;
+      background:rgba(0,0,0,.55);
+      z-index:50;
+      padding:22px 14px;
+      align-items:center;
+      justify-content:center;
     }
-
-    .roulette-wrap {
-      position: relative;
-      height: 118px;
-      margin: 20px 0;
-      background: #090c1d;
-      border-radius: 24px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: inset 0 0 25px rgba(0,0,0,.55);
+    .modal{
+      width:100%;max-width:430px;
+      background:#11162d;color:white;
+      border-radius:30px;
+      padding:18px;
+      box-shadow:0 25px 80px rgba(0,0,0,.45);
+      text-align:center;
     }
-
-    .roulette-shadow-left,
-    .roulette-shadow-right {
-      position: absolute;
-      top: 0;
-      width: 55px;
-      height: 100%;
-      z-index: 5;
-      pointer-events: none;
+    .roulette{
+      height:118px;background:#080b18;border-radius:24px;
+      overflow:hidden;position:relative;margin:18px 0;
+      border:1px solid rgba(255,255,255,.1)
     }
-
-    .roulette-shadow-left {
-      left: 0;
-      background: linear-gradient(90deg, #090c1d, transparent);
+    .pointer{
+      position:absolute;left:50%;top:0;bottom:0;width:4px;
+      transform:translateX(-50%);
+      background:#ffd400;z-index:5;
+      box-shadow:0 0 18px #ffd400;
     }
-
-    .roulette-shadow-right {
-      right: 0;
-      background: linear-gradient(270deg, #090c1d, transparent);
+    .items{
+      display:flex;gap:10px;padding:13px;
+      transition:transform 4s cubic-bezier(.12,.85,.16,1);
     }
-
-    .pointer {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 4px;
-      height: 100%;
-      transform: translateX(-50%);
-      background: #ffd400;
-      box-shadow: 0 0 18px #ffd400;
-      z-index: 10;
+    .rItem{
+      min-width:88px;height:92px;border-radius:20px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:46px;background:#202746;
+      border:2px solid rgba(255,255,255,.1);
     }
-
-    .pointer::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      border-left: 11px solid transparent;
-      border-right: 11px solid transparent;
-      border-top: 15px solid #ffd400;
+    .win{
+      display:none;
+      background:#fff;color:#111;border-radius:24px;
+      padding:18px;margin-top:14px;
+      animation:pop .35s ease;
     }
-
-    .items {
-      display: flex;
-      gap: 10px;
-      padding: 13px;
-      transform: translateX(0);
-      transition: transform 4s cubic-bezier(.12,.85,.16,1);
-      will-change: transform;
+    @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+    .winEmoji{font-size:74px}
+    .winName{font-size:25px;font-weight:900;margin-top:8px}
+    .btn{
+      width:100%;border:0;border-radius:18px;
+      padding:15px;font-size:17px;font-weight:900;
+      margin-top:10px;
     }
+    .openBtn{background:linear-gradient(135deg,#ffd000,#ff8a00);color:#111}
+    .battleBtn{background:linear-gradient(135deg,#ff006e,#7b2cff);color:white}
+    .closeBtn{background:#242b4a;color:white}
 
-    .item {
-      min-width: 88px;
-      height: 92px;
-      border-radius: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid rgba(255,255,255,.1);
-      box-shadow: 0 8px 25px rgba(0,0,0,.35);
-      position: relative;
-      overflow: hidden;
+    .nav{
+      position:fixed;left:12px;right:12px;bottom:12px;
+      background:white;border-radius:24px;
+      display:grid;grid-template-columns:repeat(3,1fr);
+      padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.15);
+      z-index:30;
     }
-
-    .item::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.18), transparent 45%);
-      pointer-events: none;
+    .nav button{
+      border:0;background:transparent;border-radius:16px;
+      padding:10px 4px;font-weight:800;color:#777;
     }
-
-    .emoji {
-      font-size: 34px;
-      z-index: 2;
-    }
-
-    .item-name {
-      font-size: 11px;
-      margin-top: 6px;
-      font-weight: 800;
-      z-index: 2;
-    }
-
-    .common { background: linear-gradient(135deg, #2e365f, #1b203d); }
-    .rare { background: linear-gradient(135deg, #154a7a, #172f63); border-color: #40b6ff; }
-    .epic { background: linear-gradient(135deg, #5622a8, #2a1859); border-color: #a75cff; }
-    .legendary { background: linear-gradient(135deg, #b06b00, #6b2900); border-color: #ffd000; }
-    .mythic { background: linear-gradient(135deg, #bd0b56, #4d1039); border-color: #ff4fa3; }
-
-    .rarity {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      margin-top: 5px;
-    }
-
-    .r-common { background: #313959; color: #d7dcff; }
-    .r-rare { background: #063c63; color: #66c8ff; }
-    .r-epic { background: #3f177a; color: #c996ff; }
-    .r-legendary { background: #664000; color: #ffd45c; }
-    .r-mythic { background: #65062c; color: #ff77b6; }
-
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 19px;
-      padding: 15px;
-      font-size: 17px;
-      font-weight: 900;
-      margin-top: 10px;
-    }
-
-    button:disabled {
-      opacity: .55;
-    }
-
-    .open {
-      background: linear-gradient(135deg, #ffd000, #ff8a00);
-      color: #141414;
-      box-shadow: 0 10px 30px rgba(255,160,0,.32);
-    }
-
-    .battle {
-      background: linear-gradient(135deg, #ff006e, #7b2cff);
-      color: white;
-      box-shadow: 0 10px 30px rgba(255,0,110,.25);
-    }
-
-    .result {
-      margin-top: 15px;
-      background: #141832;
-      border-radius: 22px;
-      padding: 15px;
-      display: none;
-      border: 1px solid rgba(255,255,255,.08);
-      animation: pop .35s ease;
-    }
-
-    @keyframes pop {
-      0% { transform: scale(.92); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .result-emoji {
-      font-size: 58px;
-      margin-bottom: 5px;
-    }
-
-    .result-name {
-      font-size: 22px;
-      font-weight: 900;
-    }
-
-    .toast {
-      position: fixed;
-      left: 18px;
-      right: 18px;
-      top: 18px;
-      background: #1f2445;
-      color: white;
-      border-radius: 18px;
-      padding: 14px;
-      text-align: center;
-      transform: translateY(-120px);
-      transition: .3s;
-      z-index: 50;
-      border: 1px solid rgba(255,255,255,.1);
-    }
-
-    .toast.show {
-      transform: translateY(0);
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      background: rgba(18, 21, 42, .96);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      padding: 8px;
-      backdrop-filter: blur(12px);
-    }
-
-    .nav-btn {
-      background: transparent;
-      color: #b9bdd6;
-      font-size: 13px;
-      padding: 9px 4px;
-      border-radius: 16px;
-      margin: 0;
-      box-shadow: none;
-    }
-
-    .nav-btn.active {
-      background: #24294b;
-      color: white;
-    }
+    .nav .active{background:#f0f1f5;color:#111}
   </style>
 </head>
 
 <body>
-  <div class="toast" id="toast">Сообщение</div>
+  <div class="hero">
+    <div class="stars"></div>
+    <div class="balance">Balance<br>⭐ 100</div>
+    <div class="avatar">👤</div>
+    <h1>Buy a gift</h1>
+    <div class="sub">Buy yourself a gift to add to your profile<br>or win it from a case.</div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('gifts')">All Gifts</button>
+      <button class="tab" onclick="showTab('inventory')">Inventory</button>
+    </div>
+  </div>
 
   <div class="app">
-    <div class="header">
-      <div class="title">🎁 Gift Battle</div>
-      <div class="balance">100⭐</div>
-    </div>
+    <div class="grid" id="giftGrid"></div>
+  </div>
 
-    <div class="profile">
-      <div class="username" id="user">Игрок</div>
-      <div class="small">Открывай кейсы, лови редкие подарки и участвуй в battle</div>
-    </div>
+  <div class="rouletteBox" id="rouletteBox">
+    <div class="modal">
+      <h2 id="modalTitle">Opening Gift Case</h2>
 
-    <div class="case-card">
-      <div class="case-img">🎁</div>
-      <h2>Premium Case</h2>
-      <p class="small">Цена открытия: 10⭐</p>
-
-      <div class="roulette-wrap">
-        <div class="roulette-shadow-left"></div>
-        <div class="roulette-shadow-right"></div>
+      <div class="roulette">
         <div class="pointer"></div>
         <div class="items" id="items"></div>
       </div>
 
-      <button class="open" id="openBtn" onclick="openCase(1)">🎰 Открыть кейс</button>
-      <button class="battle" id="battleBtn" onclick="battleCase(1)">⚔️ Battle 1x1</button>
-
-      <div class="result" id="result">
-        <div class="result-emoji" id="resultEmoji">🎁</div>
-        <div class="result-name" id="resultName">Prize</div>
-        <div class="rarity" id="resultRarity">COMMON</div>
+      <div class="win" id="win">
+        <div class="winEmoji" id="winEmoji">🎁</div>
+        <div class="winName" id="winName">Gift</div>
+        <div id="winPrice">⭐ 15</div>
       </div>
+
+      <button class="btn openBtn" onclick="spinGift()">🎰 Open Case 10⭐</button>
+      <button class="btn battleBtn" onclick="battle()">⚔️ Battle 1x1</button>
+      <button class="btn closeBtn" onclick="closeModal()">Close</button>
     </div>
   </div>
 
-  <div class="bottom-nav">
-    <button class="nav-btn active">🎁 Кейсы</button>
-    <button class="nav-btn" onclick="sendBot('top')">🏆 Топ</button>
-    <button class="nav-btn" onclick="sendBot('profile')">👤 Профиль</button>
+  <div class="nav">
+    <button class="active" onclick="showTab('gifts')">🎁 Gifts</button>
+    <button onclick="openCaseModal()">🎰 Case</button>
+    <button onclick="showTab('inventory')">🎒 Inventory</button>
   </div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    const user = tg.initDataUnsafe.user;
-    if (user) {
-      document.getElementById("user").innerText =
-        "@" + (user.username || user.first_name);
-    }
-
-    const prizes = [
-      { emoji: "🪙", name: "Coins", rarity: "common", chance: 45 },
-      { emoji: "💎", name: "Diamond", rarity: "rare", chance: 25 },
-      { emoji: "🎖️", name: "Medal", rarity: "rare", chance: 15 },
-      { emoji: "🔥", name: "Fire Gift", rarity: "epic", chance: 8 },
-      { emoji: "👑", name: "Crown", rarity: "legendary", chance: 5 },
-      { emoji: "💝", name: "Super Gift", rarity: "mythic", chance: 2 }
+    const gifts = [
+      {emoji:"💖", name:"Heart", price:15, rarity:"common"},
+      {emoji:"🧸", name:"Bear", price:15, rarity:"common"},
+      {emoji:"🎁", name:"Box", price:25, rarity:"rare"},
+      {emoji:"🌹", name:"Rose", price:25, rarity:"rare"},
+      {emoji:"🎂", name:"Cake", price:50, rarity:"epic"},
+      {emoji:"💐", name:"Flowers", price:50, rarity:"epic"},
+      {emoji:"🚀", name:"Rocket", price:50, rarity:"epic"},
+      {emoji:"🏆", name:"Trophy", price:100, rarity:"legend"},
+      {emoji:"💍", name:"Ring", price:100, rarity:"legend"},
+      {emoji:"👑", name:"Crown", price:250, rarity:"mythic"},
+      {emoji:"💎", name:"Diamond", price:500, rarity:"mythic"},
+      {emoji:"🦄", name:"Unicorn", price:500, rarity:"mythic"}
     ];
 
-    function weightedRandom() {
-      const total = prizes.reduce((sum, p) => sum + p.chance, 0);
-      let rand = Math.random() * total;
+    let inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
 
-      for (const prize of prizes) {
-        rand -= prize.chance;
-        if (rand <= 0) return prize;
+    function render(list){
+      const grid = document.getElementById("giftGrid");
+      grid.innerHTML = "";
+      list.forEach(g => {
+        const card = document.createElement("div");
+        card.className = "gift";
+        card.onclick = () => openCaseModal();
+        card.innerHTML = `
+          <div class="badge ${g.rarity}">${g.rarity.toUpperCase()}</div>
+          <div class="img">${g.emoji}</div>
+          <div class="price">⭐ ${g.price}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function showTab(tab){
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      if(tab === "gifts"){
+        document.querySelectorAll(".tab")[0].classList.add("active");
+        render(gifts);
+      }else{
+        document.querySelectorAll(".tab")[1].classList.add("active");
+        render(inventory.length ? inventory : [{emoji:"🎒",name:"Empty",price:0,rarity:"common"}]);
       }
-
-      return prizes[0];
     }
 
-    function createItem(prize) {
-      const div = document.createElement("div");
-      div.className = "item " + prize.rarity;
-      div.innerHTML = `
-        <div class="emoji">${prize.emoji}</div>
-        <div class="item-name">${prize.name}</div>
-      `;
-      return div;
+    function openCaseModal(){
+      document.getElementById("rouletteBox").style.display = "flex";
+      fillRoulette(gifts[0]);
     }
 
-    function fillRoulette(winner) {
+    function closeModal(){
+      document.getElementById("rouletteBox").style.display = "none";
+    }
+
+    function weightedGift(){
+      const pool = [
+        ...Array(35).fill(gifts[0]),
+        ...Array(30).fill(gifts[1]),
+        ...Array(18).fill(gifts[2]),
+        ...Array(10).fill(gifts[4]),
+        ...Array(5).fill(gifts[7]),
+        ...Array(2).fill(gifts[10])
+      ];
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
+
+    function fillRoulette(winner){
       const items = document.getElementById("items");
       items.innerHTML = "";
-
-      const list = [];
-
-      for (let i = 0; i < 42; i++) {
-        list.push(prizes[Math.floor(Math.random() * prizes.length)]);
+      let arr = [];
+      for(let i=0;i<42;i++){
+        arr.push(gifts[Math.floor(Math.random()*gifts.length)]);
       }
+      arr[36] = winner;
 
-      list[36] = winner;
-
-      list.forEach(prize => items.appendChild(createItem(prize)));
+      arr.forEach(g=>{
+        const item = document.createElement("div");
+        item.className = "rItem";
+        item.textContent = g.emoji;
+        items.appendChild(item);
+      });
     }
 
-    function toast(text) {
-      const el = document.getElementById("toast");
-      el.innerText = text;
-      el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 1800);
-    }
-
-    function showResult(prize) {
-      const result = document.getElementById("result");
-      const rarity = document.getElementById("resultRarity");
-
-      document.getElementById("resultEmoji").innerText = prize.emoji;
-      document.getElementById("resultName").innerText = prize.name;
-
-      rarity.className = "rarity r-" + prize.rarity;
-      rarity.innerText = prize.rarity.toUpperCase();
-
-      result.style.display = "block";
-    }
-
-    function spin(callbackAction, caseId) {
-      const winner = weightedRandom();
+    function spinGift(){
+      const winner = weightedGift();
       const items = document.getElementById("items");
-      const openBtn = document.getElementById("openBtn");
-      const battleBtn = document.getElementById("battleBtn");
+      const win = document.getElementById("win");
 
-      document.getElementById("result").style.display = "none";
-
-      openBtn.disabled = true;
-      battleBtn.disabled = true;
-
+      win.style.display = "none";
       fillRoulette(winner);
 
       items.style.transition = "none";
       items.style.transform = "translateX(0px)";
 
-      setTimeout(() => {
+      setTimeout(()=>{
         const itemWidth = 98;
-        const winnerIndex = 36;
-        const screenCenter = window.innerWidth / 2;
-        const offset = winnerIndex * itemWidth - screenCenter + 62;
-
+        const offset = 36 * itemWidth - window.innerWidth/2 + 62;
         items.style.transition = "transform 4s cubic-bezier(.12,.85,.16,1)";
         items.style.transform = `translateX(-${offset}px)`;
-      }, 80);
+      },80);
 
-      setTimeout(() => {
-        showResult(winner);
-        toast("🎉 Выпало: " + winner.name);
+      setTimeout(()=>{
+        document.getElementById("winEmoji").textContent = winner.emoji;
+        document.getElementById("winName").textContent = winner.name;
+        document.getElementById("winPrice").textContent = "⭐ " + winner.price;
+        win.style.display = "block";
+
+        inventory.unshift(winner);
+        localStorage.setItem("inventory", JSON.stringify(inventory));
 
         tg.sendData(JSON.stringify({
-          action: callbackAction,
-          case_id: caseId,
-          visual_prize: winner.name,
-          visual_rarity: winner.rarity
+          action:"open_case",
+          case_id:1,
+          gift_name:winner.name,
+          gift_price:winner.price,
+          gift_rarity:winner.rarity
         }));
-
-        openBtn.disabled = false;
-        battleBtn.disabled = false;
-      }, 4300);
+      },4300);
     }
 
-    function openCase(caseId) {
-      toast("🎰 Крутим рулетку...");
-      spin("open_case", caseId);
+    function battle(){
+      spinGift();
+      setTimeout(()=>{
+        tg.sendData(JSON.stringify({
+          action:"battle_case",
+          case_id:1
+        }));
+      },4500);
     }
 
-    function battleCase(caseId) {
-      toast("⚔️ Запускаем battle...");
-      spin("battle_case", caseId);
-    }
-
-    function sendBot(action) {
-      tg.sendData(JSON.stringify({
-        action: action,
-        case_id: 1
-      }));
-    }
-
-    fillRoulette(prizes[0]);
+    render(gifts);
   </script>
 </body>
 </html>
+
